@@ -9,7 +9,7 @@ Thrift, cassandra and all the dependencies are already bundled.
 
 - make a connection:
 (use 'cassandra-wrapper.core)
-(def *cassandra* (make-connection))
+(def *cassandra* (make-connection "localhost" 9160))
 
 - defining a schema
 (def *schema* (schema-ks "test" :rack-unaware 1
@@ -49,8 +49,10 @@ Thrift, cassandra and all the dependencies are already bundled.
                                   "drinks" [(add-super-column-value-mutation "soft drinks" {"juices" "apple" "soda" "coke"})]} :all)
 
 - super columns
-(get-super-col c *uuid* ["drinks" "soft drinks"] :all)
+(get-super-col *cassandra* *uuid* ["drinks" "soft drinks"] :all)
 
+- closing a connection
+(close *cassandra*)
 
 
 ## Installation
