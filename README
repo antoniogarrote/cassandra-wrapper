@@ -30,7 +30,7 @@ Thrift, cassandra and all the dependencies are already bundled.
 (insert-col *cassandra* *uuid* ["foods" "rices"] "paella" :all)
 (insert-col *cassandra* *uuid* ["foods" "pasta"] "lassagna" :all)
 
-(get-col c *uuid* ["foods" "desserts"] :all)
+(get-col *cassandra* *uuid* ["foods" "desserts"] :all)
 ;{:name "desserts" :value "ice cream" :clock Clock}
 
 (remove-col *cassandra* *uuid* ["foods" "desserts"] :all)
