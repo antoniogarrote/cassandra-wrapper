@@ -1,0 +1,63 @@
+# cassandra-wrapper
+
+A wrapper for the Cassandra thrift API trying to keep up with latest cassandra trunk.
+It also requires Clojure 1.2.
+
+Thrift, cassandra and all the dependencies are already bundled.
+
+## Usage
+
+- make a connection:
+(use 'cassandra-wrapper.core)
+(def *cassandra* (make-connection))
+
+- defining a schema
+(def *schema* (schema-ks "test" :rack-unaware 1
+                  [(schema-standard-cf ks "foods")  ; standard column family
+                   (schema-super-cf ks "drinks")])) ; super columns column family
+(schema-add-ks *cassandra* *schema*)
+
+- using keyspace "test"
+(use-ks *cassandra* "test")
+
+- changing serialzation/deserialization functions
+(alter-serializer-fn my-json-serializer-fn)
+(alter-deserializer-fn my-json-deserializer-fn)
+
+- inserting and removing columns:
+(def *uuid* (uuid))
+(insert-col *cassandra* *uuid* ["foods" "desserts"] "ice cream" :all)
+(insert-col *cassandra* *uuid* ["foods" "rices"] "paella" :all)
+(insert-col *cassandra* *uuid* ["foods" "pasta"] "lassagna" :all)
+
+(get-col c *uuid* ["foods" "desserts"] :all)
+;{:name "desserts" :value "ice cream" :clock Clock}
+
+(remove-col *cassandra* *uuid* ["foods" "desserts"] :all)
+(remove-col *cassandra* *uuid* ["foods"] :all)
+
+- slice predicates
+(get-slice *cassandra* ["foods"] [:first "desserts" :count 10] :all)
+(get-slice *cassandra* ["foods"] ["desserts" "rices"] :all)
+
+- range-slices
+(get-range-slices *cassandra* ["foods"] [:start "rices"] [:start-key *uuid* :end-key *uuid*] :all)
+
+- batch operations
+(batch-mutate *cassandra* *uuid* {"foods" [(add-column-value-mutation "rices" "paella")
+                                           (add-column-value-mutation "desserts" "ice-cream")]
+                                  "drinks" [(add-super-column-value-mutation "soft drinks" {"juices" "apple" "soda" "coke"})]} :all)
+
+- super columns
+(get-super-col c *uuid* ["drinks" "soft drinks"] :all)
+
+
+
+## Installation
+
+Leiningen: [cassandra-wrapper "0.6.3-SNAPSHOT"]
+
+
+## License
+
+LGPL
